@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        style="@style/GameName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="150dp"
+        android:text="@string/app_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageRockMain"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="@string/rock"
+        android:rotation="-49"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        android:background="@drawable/border"
+        android:padding="4dp"
+        app:srcCompat="@drawable/rock" />
+
+    <ImageView
+        android:id="@+id/imagePaperMain"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="@string/paper"
+        android:rotation="49"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        android:background="@drawable/border"
+        android:padding="4dp"
+        app:srcCompat="@drawable/paper" />
+
+    <ImageView
+        android:id="@+id/imageScissorsMain"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="23dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="62dp"
+        android:contentDescription="@string/scissors"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toStartOf="@+id/imagePaperMain"
+        app:layout_constraintStart_toEndOf="@+id/imageRockMain"
+        android:background="@drawable/border"
+        android:padding="4dp"
+        app:srcCompat="@drawable/scissors" />
+
+    <LinearLayout
+        android:layout_width="301dp"
+        android:layout_height="400dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="50dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+
+        <Button
+            android:id="@+id/start_game_btn"
+            style="@style/MenuButtons"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="@string/startGameButton" />
+
+        <Button
+            android:id="@+id/newGameButton"
+            style="@style/MenuButtons"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="@string/restartButton" />
+
+        <Button
+            android:id="@+id/setting_btn"
+            style="@style/MenuButtons"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="@string/settingsButton" />
+
+        <Button
+            android:id="@+id/exit_btn"
+            style="@style/MenuButtons"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="@string/exitButton" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

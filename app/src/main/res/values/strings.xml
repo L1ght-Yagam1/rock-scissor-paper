@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Камень-Ножницы-Бумага</string>
+    <string name="backButton">НАЗАД</string>
+
+
+    <!--    main page  -->
+    <string name="startGameButton">Играть</string>
+    <string name="settingsButton">Настройки</string>
+    <string name="exitButton">ВЫХОД</string>
+
+<!--    play page-->
+    <string name="gameScore">You 0:0 Bot</string>
+    <string name="rock">Rock</string>
+    <string name="paper">Paper</string>
+    <string name="scissors">Scissors</string>
+    <string name="makeMove">Сделать ход</string>
+    <string name="botMove">Ход бота: </string>
+    <string name="restartButton">Новая игра</string>
+    <string name="maxScoreValue">Игра до:</string>
+</resources>

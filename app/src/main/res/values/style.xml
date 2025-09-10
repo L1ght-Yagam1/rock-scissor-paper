@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="GameName">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    
+    <style name="MenuButtons">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="GameScore">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="GameImages">
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:background">"@drawable/border"</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
+    <style name="SettingsText">
+        <item name="android:textSize">22sp</item>
+    </style>
+</resources>
