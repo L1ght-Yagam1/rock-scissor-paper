@@ -21,6 +21,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _botMove = MutableLiveData<Move?>()
     private val _winner =  MutableLiveData<String?>()
 
+    private val _botMoveObject = MutableLiveData<Move?>()
+
+    val botMoveObject: LiveData<Move?> = _botMoveObject
+
     // Переменные для отображения данных
     val maxScore: LiveData<Int> = _maxScore
 
@@ -38,6 +42,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         addSource(_botMove) { update() }
     }
     val winner: LiveData<String?> = _winner
+    private val _roundWinner =  MutableLiveData<String>()
+    val roundWinner: LiveData<String> = MediatorLiveData<String>().apply {
+        fun update() {
+            value = "Победитель раунда: ${_roundWinner.value ?: ""}"
+        }
+        addSource(_roundWinner) { update() }
+        update()
+    }
 
     val scoreText: LiveData<String> = MediatorLiveData<String>().apply {
         fun update() {
@@ -65,6 +77,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _maxScore.value = game.maxScore
         _winner.value = game.winner
         _botMove.value = game.botMove
+        _botMoveObject.value = game.botMove
+        _roundWinner.value = game.roundWinner
     }
 
 

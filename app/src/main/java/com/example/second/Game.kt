@@ -6,15 +6,22 @@ class Game {
     var maxScore = 3
     var winner: String? = null
 
+    var roundWinner: String? = null
+
      var botMove: Move = Move.PAPER
 
     fun play(playerMove: Move) {
         this.botMove = Move.entries.random()
         if (playerMove.defeats(this.botMove)) {
+            roundWinner = "Player"
             playerScore++
         } else if (this.botMove.defeats(playerMove)) {
             botScore++
+            roundWinner = "Bot"
         }
+
+        else
+            roundWinner = "Ничья"
 
         if (playerScore >= maxScore) winner = "Player"
         if (botScore >= maxScore) winner = "Bot"

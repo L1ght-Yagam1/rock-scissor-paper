@@ -24,12 +24,12 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="20dp"
+        android:background="@drawable/border"
         android:contentDescription="@string/rock"
-        android:rotation="-49"
+        android:padding="4dp"
+        android:rotation="49"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        android:background="@drawable/border"
-        android:padding="4dp"
         app:srcCompat="@drawable/rock" />
 
     <ImageView
@@ -37,12 +37,12 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="20dp"
+        android:background="@drawable/border"
         android:contentDescription="@string/paper"
+        android:padding="4dp"
         android:rotation="49"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="@+id/textView"
-        android:background="@drawable/border"
-        android:padding="4dp"
         app:srcCompat="@drawable/paper" />
 
     <ImageView
