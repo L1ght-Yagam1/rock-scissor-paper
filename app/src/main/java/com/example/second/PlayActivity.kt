@@ -3,9 +3,8 @@ package com.example.second
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
@@ -14,8 +13,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class PlayActivity : AppCompatActivity() {
 
@@ -23,8 +20,16 @@ class PlayActivity : AppCompatActivity() {
     private var selectedMove: Move? = null
 
     private lateinit var scoreTextView: TextView
-
     private lateinit var winnerTextView: TextView
+    private lateinit var playerMoveImage: ImageView
+    private lateinit var botMoveImage: ImageView
+    private lateinit var botMoveText: TextView
+
+    private lateinit var moveButtons: Map<ImageView, Move>
+
+    private lateinit var animFromLeft: Animation
+    private lateinit var animFromRight: Animation
+
 
 
     @SuppressLint("SetTextI18n")
@@ -33,162 +38,96 @@ class PlayActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_play)
 
+        setupUI()
+        setupObservers()
+        setupAnimations()
+    }
+
+    private fun setupUI() {
         scoreTextView = findViewById(R.id.scoreText)
         winnerTextView = findViewById(R.id.winnerTextView)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-
+        botMoveText = findViewById(R.id.botMoveText)
+        playerMoveImage = findViewById(R.id.playerMoveImage)
+        botMoveImage = findViewById(R.id.botMoveImage)
 
         val rockButton: ImageView = findViewById(R.id.imageRock)
         val paperButton: ImageView = findViewById(R.id.imagePaper)
         val scissorsButton: ImageView = findViewById(R.id.imageScissors)
-        val buttonBack: Button = findViewById(R.id.backButton)
         val makeMove: Button = findViewById(R.id.makeMove)
-        val botMoveText: TextView = findViewById(R.id.botMoveText)
-        val playerMoveImage: ImageView = findViewById(R.id.playerMoveImage)
-        val botMoveImage: ImageView = findViewById(R.id.botMoveImage)
+        val backButton: Button = findViewById(R.id.backButton)
 
-        val animFromLeft = AnimationUtils.loadAnimation(this, R.anim.move_from_left)
-        val animFromRight = AnimationUtils.loadAnimation(this, R.anim.move_from_right)
+        moveButtons = mapOf(
+            rockButton to Move.ROCK,
+            paperButton to Move.PAPER,
+            scissorsButton to Move.SCISSORS
+        )
 
-        fun resetRound() {
-            // Сбрасываем прозрачность
-            playerMoveImage.alpha = 1.0f
-            botMoveImage.alpha = 1.0f
-
-            // Сброс победителя раунда
-            winnerTextView.text = ""
-
-            playerMoveImage.visibility = View.INVISIBLE
-            botMoveImage.visibility = View.INVISIBLE
-
-
-            botMoveText.text = ""
-        }
-
-
-        fun highlightWinner(playerMove: Move, botMove: Move) {
-
-
-
-            val playerWins = playerMove.defeats(botMove)
-            val botWins = botMove.defeats(playerMove)
-
-            if (playerWins) {
-                // Бот проиграл — делаем его картинку полупрозрачной
-                botMoveImage.animate().alpha(0.3f).setDuration(500).start()
-                playerMoveImage.alpha = 1.0f
-            } else if (botWins) {
-                // Игрок проиграл
-                playerMoveImage.animate().alpha(0.3f).setDuration(500).start()
-                botMoveImage.alpha = 1.0f
-            } else {
-                // Ничья
-                playerMoveImage.alpha = 1.0f
-                botMoveImage.alpha = 1.0f
+        moveButtons.forEach { (button, move) ->
+            button.setOnClickListener {
+                selectedMove = move
+                highlightSelection(move)
             }
         }
 
+        makeMove.setOnClickListener { onMakeMove() }
+        backButton.setOnClickListener { finish() }
+    }
 
+    private fun setupObservers() {
+        game.scoreText.observe(this) { scoreTextView.text = it }
+        game.roundWinner.observe(this) { winnerTextView.text = it }
+        game.winner.observe(this) { winner -> winner?.let { showWinnerDialog(it) } }
+    }
 
-        fun getMoveDrawable(move: Move): Int {
-            return when(move) {
-                Move.ROCK -> R.drawable.rock
-                Move.PAPER -> R.drawable.paper
-                Move.SCISSORS -> R.drawable.scissors
-            }
+    private fun setupAnimations() {
+        animFromLeft = AnimationUtils.loadAnimation(this, R.anim.move_from_left)
+        animFromRight = AnimationUtils.loadAnimation(this, R.anim.move_from_right)
+    }
+
+    fun getMoveDrawable(move: Move): Int {
+        return when(move) {
+            Move.ROCK -> R.drawable.rock
+            Move.PAPER -> R.drawable.paper
+            Move.SCISSORS -> R.drawable.scissors
         }
+    }
 
+    private fun onMakeMove() {
+        selectedMove?.let { move ->
+            // игрок сделал ход
+            game.play(move)
 
-        fun onPlayerMoveSelected(playerMove: Move) {
-            resetRound()
-
-            playerMoveImage.setImageResource(getMoveDrawable(playerMove))
+            // анимация для картинок
+            playerMoveImage.setImageResource(getMoveDrawable(move))
             playerMoveImage.visibility = View.VISIBLE
             playerMoveImage.startAnimation(animFromLeft)
 
-            game.play(playerMove)
-
-            botMoveImage.setImageResource(getMoveDrawable(game.botMoveObject.value!!))
+            val botMove = game.botMoveObject.value!!
+            botMoveImage.setImageResource(getMoveDrawable(botMove))
             botMoveImage.visibility = View.VISIBLE
             botMoveImage.startAnimation(animFromRight)
 
-            botMoveText.text = "Ход бота: " + (game.botMoveObject.value?.name ?: "None")
-
-            // Подсветка победителя
-            val botMove = game.botMoveObject.value!!
-            Handler(Looper.getMainLooper()).postDelayed({
-                highlightWinner(playerMove, botMove) }, 300)
-        }
-
-
-
-        buttonBack.setOnClickListener {
-            finish()
-        }
-
-        fun highlightSelection(move: Move) {
-            rockButton.alpha = if (move == Move.ROCK) 1.0f else 0.5f
-            paperButton.alpha = if (move == Move.PAPER) 1.0f else 0.5f
-            scissorsButton.alpha = if (move == Move.SCISSORS) 1.0f else 0.5f
-        }
-
-        rockButton.setOnClickListener {
-            selectedMove = Move.ROCK
-            highlightSelection(Move.ROCK)
-        }
-
-        paperButton.setOnClickListener {
-            selectedMove = Move.PAPER
-            highlightSelection(Move.PAPER)
-        }
-
-        scissorsButton.setOnClickListener {
-            selectedMove = Move.SCISSORS
-            highlightSelection(Move.SCISSORS)
-
-        }
-
-        game.scoreText.observe(this) { text ->
-            scoreTextView.text = text
-        }
-
-        game.roundWinner.observe(this) { text ->
-            winnerTextView.text = text
-        }
-
-
-
-        game.winner.observe(this) { winner ->
-            winner?.let {
-                val title = if (it == "Bot") "Поражение" else "Победа"
-                val dialog = AlertDialog.Builder(this)
-                    .setTitle(title)
-                    .setMessage("$it победил!")
-                    .setPositiveButton("Ок") { dialog, _ ->
-                        dialog.dismiss()
-                        resetRound()
-                        game.resetGame()
-                    }
-                    .create() // создаём, но пока не показываем
-
-                dialog.setCancelable(false)        // запрет "Назад"
-                dialog.setCanceledOnTouchOutside(false) // запрет нажатия вне окна
-                dialog.show()
-            }
-        }
-
-
-        makeMove.setOnClickListener {
-            selectedMove?.let { move ->
-                onPlayerMoveSelected(move)
-            } ?: Toast.makeText(this, "Выберите ход!", Toast.LENGTH_SHORT).show()
-        }
-
+            botMoveText.text = getString(R.string.bot_move, botMove.name)
+        } ?: Toast.makeText(this, R.string.choose_move, Toast.LENGTH_SHORT).show()
     }
+
+    private fun highlightSelection(move: Move) {
+        moveButtons.forEach { (button, m) ->
+            button.alpha = if (m == move) 1.0f else 0.5f
+        }
+    }
+
+    private fun showWinnerDialog(winner: String) {
+        val title = if (winner == "Bot") getString(R.string.defeat) else getString(R.string.victory)
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage("$winner победил!")
+            .setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                game.resetGame()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
 }

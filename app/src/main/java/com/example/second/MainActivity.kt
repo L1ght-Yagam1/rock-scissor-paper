@@ -14,34 +14,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setupUI()
+    }
 
-
-        val exitButton: Button = findViewById(R.id.exit_btn)
-        val newGameButton: Button = findViewById(R.id.newGameButton)
-        val intentPlay =  Intent(this, PlayActivity::class.java)
-        val intentSettings =  Intent(this, SettingsActivity::class.java)
-
-
-        exitButton.setOnClickListener {
-            finishAffinity()
+    private fun setupUI() {
+        findViewById<Button>(R.id.exit_btn).setOnClickListener { finishAffinity() }
+        findViewById<Button>(R.id.setting_btn).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
-
-
-        val buttonSettings: Button = findViewById(R.id.setting_btn)
-
-        buttonSettings.setOnClickListener {
-            startActivity(intentSettings)
+        findViewById<Button>(R.id.start_game_btn).setOnClickListener {
+            startActivity(Intent(this, PlayActivity::class.java))
         }
-
-        val buttonPlay: Button = findViewById(R.id.start_game_btn)
-
-        buttonPlay.setOnClickListener {
-            startActivity(intentPlay)
-        }
-
-        newGameButton.setOnClickListener {
+        findViewById<Button>(R.id.newGameButton).setOnClickListener {
             gameViewModel.resetGame()
-            startActivity(intentPlay)
+            startActivity(Intent(this, PlayActivity::class.java))
         }
     }
+
+
 }

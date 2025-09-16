@@ -17,4 +17,11 @@
     <string name="botMove">Ход бота: </string>
     <string name="restartButton">Новая игра</string>
     <string name="maxScoreValue">Игра до:</string>
+
+    <string name="bot_move">Ход бота: %1$s</string>
+    <string name="defeat">Поражение</string>
+    <string name="victory">Победа</string>
+    <string name="choose_move">Выберите ход</string>
+    <string name="ok">Ok</string>
+
 </resources>

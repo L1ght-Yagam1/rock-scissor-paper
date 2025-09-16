@@ -10,12 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class SettingsActivity : AppCompatActivity() {
 
     private val game: GameViewModel by viewModels()
+
+    private lateinit var buttonBack: Button
+    private lateinit var textMaxValue: TextView
+    private lateinit var maxValueBar: SeekBar
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
@@ -23,27 +25,19 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
-        val buttonBack: Button = findViewById(R.id.backButton)
-        val textMaxValue: TextView = findViewById(R.id.maxValueText)
-        val maxValueBar: SeekBar = findViewById(R.id.maxValueBar)
+        setupUI()
+        setupObservers()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupUI() {
+        buttonBack = findViewById(R.id.backButton)
+        textMaxValue = findViewById(R.id.maxValueText)
+        maxValueBar = findViewById(R.id.maxValueBar)
 
         maxValueBar.max = 10
         maxValueBar.min = 1
-
-        game.maxScore.observe(this) { score ->
-            maxValueBar.progress = score
-        }
-
-        game.maxScoreText.observe(this) { text ->
-            textMaxValue.text = text
-        }
-
 
         maxValueBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -56,6 +50,16 @@ class SettingsActivity : AppCompatActivity() {
 
         buttonBack.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun setupObservers() {
+        game.maxScore.observe(this) { score ->
+            maxValueBar.progress = score
+        }
+
+        game.maxScoreText.observe(this) { text ->
+            textMaxValue.text = text
         }
     }
 }
