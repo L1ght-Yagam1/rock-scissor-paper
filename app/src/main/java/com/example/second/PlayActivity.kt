@@ -1,6 +1,7 @@
 package com.example.second
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,6 +24,8 @@ class PlayActivity : AppCompatActivity() {
 
     private lateinit var scoreTextView: TextView
 
+    private lateinit var winnerTextView: TextView
+
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +34,7 @@ class PlayActivity : AppCompatActivity() {
         setContentView(R.layout.activity_play)
 
         scoreTextView = findViewById(R.id.scoreText)
+        winnerTextView = findViewById(R.id.winnerTextView)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -48,7 +52,6 @@ class PlayActivity : AppCompatActivity() {
         val botMoveText: TextView = findViewById(R.id.botMoveText)
         val playerMoveImage: ImageView = findViewById(R.id.playerMoveImage)
         val botMoveImage: ImageView = findViewById(R.id.botMoveImage)
-        val winnerTextView: TextView = findViewById(R.id.winnerTextView)
 
         val animFromLeft = AnimationUtils.loadAnimation(this, R.anim.move_from_left)
         val animFromRight = AnimationUtils.loadAnimation(this, R.anim.move_from_right)
@@ -60,6 +63,12 @@ class PlayActivity : AppCompatActivity() {
 
             // Сброс победителя раунда
             winnerTextView.text = ""
+
+            playerMoveImage.visibility = View.INVISIBLE
+            botMoveImage.visibility = View.INVISIBLE
+
+
+            botMoveText.text = ""
         }
 
 
@@ -105,6 +114,12 @@ class PlayActivity : AppCompatActivity() {
 
             game.play(playerMove)
 
+            botMoveImage.setImageResource(getMoveDrawable(game.botMoveObject.value!!))
+            botMoveImage.visibility = View.VISIBLE
+            botMoveImage.startAnimation(animFromRight)
+
+            botMoveText.text = "Ход бота: " + (game.botMoveObject.value?.name ?: "None")
+
             // Подсветка победителя
             val botMove = game.botMoveObject.value!!
             Handler(Looper.getMainLooper()).postDelayed({
@@ -143,28 +158,31 @@ class PlayActivity : AppCompatActivity() {
             scoreTextView.text = text
         }
 
-        game.botMove.observe(this) { bot ->
-            botMoveText.text = bot
-        }
-
         game.roundWinner.observe(this) { text ->
             winnerTextView.text = text
         }
 
-        game.botMoveObject.observe(this) { botMove ->
-            botMove?.let {
-                botMoveImage.setImageResource(getMoveDrawable(it))
-                botMoveImage.visibility = View.VISIBLE
-                botMoveImage.startAnimation(animFromRight)
-            }
-        }
+
 
         game.winner.observe(this) { winner ->
             winner?.let {
-                Toast.makeText(this, "$it победил!", Toast.LENGTH_LONG).show()
-                game.resetGame()
+                val title = if (it == "Bot") "Поражение" else "Победа"
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage("$it победил!")
+                    .setPositiveButton("Ок") { dialog, _ ->
+                        dialog.dismiss()
+                        resetRound()
+                        game.resetGame()
+                    }
+                    .create() // создаём, но пока не показываем
+
+                dialog.setCancelable(false)        // запрет "Назад"
+                dialog.setCanceledOnTouchOutside(false) // запрет нажатия вне окна
+                dialog.show()
             }
         }
+
 
         makeMove.setOnClickListener {
             selectedMove?.let { move ->

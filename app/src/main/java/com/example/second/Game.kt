@@ -6,7 +6,7 @@ class Game {
     var maxScore = 3
     var winner: String? = null
 
-    var roundWinner: String? = null
+    var roundWinner  = ""
 
      var botMove: Move = Move.PAPER
 
@@ -35,9 +35,10 @@ class Game {
         winner = null
     }
 
-    fun setScores(player: Int, bot: Int, max1: Int) {
+    fun setScores(player: Int, bot: Int, max1: Int, roundWinner: String) {
         playerScore = player
         botScore = bot
         maxScore = max1
+        this.roundWinner = roundWinner
     }
 }

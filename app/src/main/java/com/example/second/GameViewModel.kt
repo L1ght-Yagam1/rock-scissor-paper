@@ -20,12 +20,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _maxScore = MutableLiveData(prefs.getInt("maxScore", 3))
     private val _botMove = MutableLiveData<Move?>()
     private val _winner =  MutableLiveData<String?>()
+    private val _roundWinner =  MutableLiveData(prefs.getString("roundWinner", "None"))
 
-    private val _botMoveObject = MutableLiveData<Move?>()
 
-    val botMoveObject: LiveData<Move?> = _botMoveObject
-
-    // Переменные для отображения данных
+    var botMoveObject: LiveData<Move?> = _botMove
     val maxScore: LiveData<Int> = _maxScore
 
     val maxScoreText: LiveData<String> = MediatorLiveData<String>().apply {
@@ -35,25 +33,17 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         addSource(_maxScore) { update() }
         update()
     }
-    val botMove: LiveData<String> = MediatorLiveData<String>().apply {
-        fun update() {
-            value = "Бот выбрал ${_botMove.value ?: "ничего"}"
-        }
-        addSource(_botMove) { update() }
-    }
     val winner: LiveData<String?> = _winner
-    private val _roundWinner =  MutableLiveData<String>()
-    val roundWinner: LiveData<String> = MediatorLiveData<String>().apply {
+    val roundWinner: LiveData<String?> =   MediatorLiveData<String>().apply {
         fun update() {
             value = "Победитель раунда: ${_roundWinner.value ?: ""}"
         }
         addSource(_roundWinner) { update() }
-        update()
     }
 
     val scoreText: LiveData<String> = MediatorLiveData<String>().apply {
         fun update() {
-            value = "Player: ${_playerScore.value ?: 0}  Bot: ${_botScore.value ?: 0}"
+            value = "Player ${_playerScore.value ?: 0} : ${_botScore.value ?: 0} Bot"
         }
         addSource(_playerScore) { update() }
         addSource(_botScore) { update() }
@@ -65,8 +55,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         val p = prefs.getInt("playerScore", 0)
         val b = prefs.getInt("botScore", 0)
         val m = prefs.getInt("maxScore", 3)
+        var r = prefs.getString("roundWinner", "")
 
-        game.setScores(p, b, m)
+        game.setScores(p, b, m, r.toString())
 
         update()
     }
@@ -77,7 +68,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _maxScore.value = game.maxScore
         _winner.value = game.winner
         _botMove.value = game.botMove
-        _botMoveObject.value = game.botMove
         _roundWinner.value = game.roundWinner
     }
 
@@ -104,6 +94,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             putInt("playerScore", _playerScore.value ?: 0)
             putInt("botScore", _botScore.value ?: 0)
             putInt("maxScore", _maxScore.value ?: 3)
+            putString("roundWinner", _roundWinner.value ?: "")
         }
     }
 }
