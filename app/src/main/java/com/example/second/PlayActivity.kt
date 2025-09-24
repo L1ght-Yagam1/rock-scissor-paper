@@ -3,6 +3,8 @@ package com.example.second
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -92,23 +94,56 @@ class PlayActivity : AppCompatActivity() {
         }
     }
 
+    fun highlightWinner(playerMove: Move, botMove: Move) {
+        val playerWins = playerMove.defeats(botMove)
+        val botWins = botMove.defeats(playerMove)
+
+        if (playerWins) {
+            // Бот проиграл — делаем его картинку полупрозрачной
+            botMoveImage.animate().alpha(0.3f).setDuration(500).start()
+            playerMoveImage.alpha = 1.0f
+        } else if (botWins) {
+            // Игрок проиграл
+            playerMoveImage.animate().alpha(0.3f).setDuration(500).start()
+            botMoveImage.alpha = 1.0f
+        } else {
+            // Ничья
+            playerMoveImage.alpha = 1.0f
+            botMoveImage.alpha = 1.0f
+        }
+    }
+
     private fun onMakeMove() {
         selectedMove?.let { move ->
-            // игрок сделал ход
-            game.play(move)
+            resetRound()
 
             // анимация для картинок
             playerMoveImage.setImageResource(getMoveDrawable(move))
             playerMoveImage.visibility = View.VISIBLE
             playerMoveImage.startAnimation(animFromLeft)
 
+            game.play(move)
+
             val botMove = game.botMoveObject.value!!
             botMoveImage.setImageResource(getMoveDrawable(botMove))
             botMoveImage.visibility = View.VISIBLE
             botMoveImage.startAnimation(animFromRight)
 
+            Handler(Looper.getMainLooper()).postDelayed({
+                highlightWinner(move, botMove) }, 300)
+
             botMoveText.text = getString(R.string.bot_move, botMove.name)
         } ?: Toast.makeText(this, R.string.choose_move, Toast.LENGTH_SHORT).show()
+    }
+
+    fun resetRound() {
+        listOf(playerMoveImage, botMoveImage).forEach {
+            it.alpha = 1.0f
+            it.visibility = View.INVISIBLE
+        }
+
+        winnerTextView.text = ""
+        botMoveText.text = ""
     }
 
     private fun highlightSelection(move: Move) {
@@ -125,6 +160,7 @@ class PlayActivity : AppCompatActivity() {
             .setPositiveButton(R.string.ok) { dialog, _ ->
                 dialog.dismiss()
                 game.resetGame()
+                resetRound()
             }
             .setCancelable(false)
             .show()
